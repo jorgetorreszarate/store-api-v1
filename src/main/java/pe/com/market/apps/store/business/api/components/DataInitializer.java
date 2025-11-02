@@ -3,6 +3,7 @@ package pe.com.market.apps.store.business.api.components;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import pe.com.market.apps.store.business.data.model.document.*;
 import pe.com.market.apps.store.business.data.repository.*;
@@ -21,6 +22,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PersonalRepository personalRepository;
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -41,7 +43,7 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    // Tipos de usuario
+    // Tipos de username
     private Flux<UserTypeDocument> registerUserTypes() {
         return userTypeRepository.count()
                 .filter(count -> count == 0) // solo si está vacío
@@ -121,7 +123,7 @@ public class DataInitializer implements CommandLineRunner {
                                                 null,
                                                 "ADMIN",
                                                 personalId,
-                                                "123",
+                                                passwordEncoder.encode("123"),
                                                 1,
                                                 true
                                         )
