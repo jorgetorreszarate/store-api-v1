@@ -4,14 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import pe.com.market.apps.store.business.data.model.document.PersonalDocument;
-import pe.com.market.apps.store.business.data.model.document.PersonalIdentityDocument;
-import pe.com.market.apps.store.business.data.model.document.UserDocument;
-import pe.com.market.apps.store.business.data.model.document.UserTypeDocument;
-import pe.com.market.apps.store.business.data.repository.PersonalIdentityRepository;
-import pe.com.market.apps.store.business.data.repository.PersonalRepository;
-import pe.com.market.apps.store.business.data.repository.UserRepository;
-import pe.com.market.apps.store.business.data.repository.UserTypeRepository;
+import pe.com.market.apps.store.business.data.model.document.*;
+import pe.com.market.apps.store.business.data.repository.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,6 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserTypeRepository userTypeRepository;
     private final PersonalIdentityRepository personalIdentityRepository;
     private final PersonalRepository personalRepository;
+    private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -34,7 +29,9 @@ public class DataInitializer implements CommandLineRunner {
         try {
             registerUserTypes().subscribe();
             registerDocuments().subscribe();
-            registerPersonal()
+
+            registerCompany()
+                    .flatMap(this::registerPersonal)
                     .flatMap(this::registerUserAdmin)
                     .subscribe();
 
@@ -64,19 +61,37 @@ public class DataInitializer implements CommandLineRunner {
                         Flux.just(
                                 new PersonalIdentityDocument(1, "DNI"),
                                 new PersonalIdentityDocument(2, "CARNET DE EXTRANJERIA"),
-                                new PersonalIdentityDocument(3, "PASAPORTE")
+                                new PersonalIdentityDocument(3, "PASAPORTE"),
+                                new PersonalIdentityDocument(4, "RUC")
                         ).flatMap(personalIdentityRepository::save)
                 );
     }
 
-    private Mono<String> registerPersonal() {
+    private Mono<String> registerCompany() {
+        return companyRepository.count()
+                .filter(count -> count == 0)
+                .flatMap(count -> {
+                    CompanyDocument company = new CompanyDocument(
+                            null,
+                            4,
+                            "201234567890",
+                            "Galaxy Training",
+                            "Galaxy Training",
+                            true
+                    );
+                    return companyRepository.save(company)
+                            .map(CompanyDocument::getId);
+                });
+    }
+
+    private Mono<String> registerPersonal(String companyId) {
         return personalRepository.count()
                 .filter(count -> count == 0)
                 .then(
                         Mono.just(
                                         new PersonalDocument(
                                                 null,
-                                                1,
+                                                companyId,
                                                 1,
                                                 "46669103",
                                                 "Torres",

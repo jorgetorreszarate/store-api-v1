@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import pe.com.market.apps.store.business.api.dto.request.UserPasswordRequest;
 import pe.com.market.apps.store.business.api.dto.request.UserRequest;
 import pe.com.market.apps.store.business.api.dto.response.UserResponse;
 import pe.com.market.apps.store.business.api.dto.validator.ObjectValidator;
@@ -24,7 +25,11 @@ public class UserHandler {
     public Mono<ServerResponse> findByPersonalId(ServerRequest request) {
         return Mono.just(request.pathVariable("personalId"))
                 .flatMap(personalId ->
-                        ok().body(userService.findByPersonalId(personalId), UserResponse.class))
+                        ok().body(
+                                userService.findByPersonalId(personalId),
+                                UserResponse.class
+                        )
+                )
                 .switchIfEmpty(ServerResponse.noContent().build());
     }
 
@@ -37,5 +42,38 @@ public class UserHandler {
                         UserResponse.class
                 )
         );
+    }
+
+    public Mono<ServerResponse> update(ServerRequest request) {
+        return ok().body(
+                fromPublisher(
+                        request.bodyToMono(UserRequest.class)
+                                .doOnNext(validator::validate)
+                                .flatMap(userService::update),
+                        UserResponse.class
+                )
+        );
+    }
+
+    public Mono<ServerResponse> updatePassword(ServerRequest request) {
+        return ok().body(
+                fromPublisher(
+                        request.bodyToMono(UserPasswordRequest.class)
+                                .doOnNext(validator::validate)
+                                .flatMap(userService::updatePassword),
+                        Boolean.class
+                )
+        );
+    }
+
+    public Mono<ServerResponse> delete(ServerRequest request) {
+        return Mono.just(request.pathVariable("id"))
+                .flatMap(id ->
+                        ok().body(
+                                userService.delete(id),
+                                Boolean.class
+                        )
+                )
+                .switchIfEmpty(ServerResponse.badRequest().build());
     }
 }

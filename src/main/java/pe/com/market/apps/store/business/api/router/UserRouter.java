@@ -17,6 +17,9 @@ public class UserRouter {
     RouterFunction<ServerResponse> userRoute(UserHandler userHandler) {
         return RouterFunctions
                 .route(GET("/api/v1/users/by-personal/{personalId}").and(accept(APPLICATION_JSON)), userHandler::findByPersonalId)
-                .andRoute(POST("/api/v1/users").and(accept(APPLICATION_JSON)), userHandler::create);
+                .andRoute(POST("/api/v1/users").and(accept(APPLICATION_JSON)), userHandler::create)
+                .andRoute(PUT("/api/v1/users").and(accept(APPLICATION_JSON)), userHandler::update)
+                .andRoute(PATCH("/api/v1/users").and(accept(APPLICATION_JSON)), userHandler::updatePassword)
+                .andRoute(DELETE("/api/v1/{id}/users").and(accept(APPLICATION_JSON)), userHandler::delete);
     }
 }

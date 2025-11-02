@@ -2,6 +2,7 @@ package pe.com.market.apps.store.business.domain.services.impl;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import pe.com.market.apps.store.business.api.dto.request.UserPasswordRequest;
 import pe.com.market.apps.store.business.api.dto.request.UserRequest;
 import pe.com.market.apps.store.business.api.dto.response.UserResponse;
 import pe.com.market.apps.store.business.data.model.document.UserDocument;
@@ -53,6 +54,41 @@ public class UserServiceImpl implements UserService {
     public Flux<UserResponse> findByPersonalId(String personalId) {
         return userRepository.findByPersonalId(personalId)
                 .flatMap(this::mapToResponse);
+    }
+
+    @Override
+    public Mono<UserResponse> update(UserRequest userDocument) {
+        return userRepository.findByUserId(userDocument.userId())
+                .next()
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("El usuario no existe")))
+                .doOnNext(user -> {
+                    user.setUserTypeId(userDocument.userTypeId());
+                    user.setPassword(userDocument.password());
+                    user.setFlagActive(userDocument.flagActive());
+                })
+                .flatMap(userRepository::save)
+                .flatMap(this::mapToResponse);
+    }
+
+    @Override
+    public Mono<Boolean> updatePassword(UserPasswordRequest userPasswordRequest) {
+        return userRepository.findByUserId(userPasswordRequest.userId())
+                .next()
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("El usuario no existe")))
+                .flatMap(user -> {
+                    user.setPassword(userPasswordRequest.password());
+                    return userRepository.save(user);
+                })
+                .thenReturn(true);
+    }
+
+    @Override
+    public Mono<Boolean> delete(String userId) {
+        return userRepository.findByUserId(userId)
+                .next()
+                .switchIfEmpty(Mono.error(new IllegalArgumentException("El usuario no existe")))
+                .flatMap(userRepository::delete)
+                .thenReturn(true);
     }
 
     private Mono<UserResponse> mapToResponse(UserDocument user) {

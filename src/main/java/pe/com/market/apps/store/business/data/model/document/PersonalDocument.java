@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class PersonalDocument {
     @Id
     private String id;
-    private int companyId;
+    private String companyId;
     private int documentTypeId;
     private String documentNumber;
     private String fatherLastName;
