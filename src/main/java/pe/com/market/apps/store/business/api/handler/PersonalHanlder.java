@@ -33,12 +33,28 @@ public class PersonalHanlder {
                 });
     }
 
+    public Mono<ServerResponse> findById(ServerRequest request) {
+        return Mono.just(request.pathVariable("id"))
+                .flatMap(id ->
+                        personalService.findById(id)
+                                .flatMap(incidencia ->
+                                        ok().body(Mono.just(incidencia), PersonalResponse.class))
+                                .switchIfEmpty(ServerResponse.noContent().build())
+                );
+    }
+
     public Mono<ServerResponse> create(ServerRequest request) {
         return ok().body(
                 request.bodyToMono(PersonalRequest.class)
                         .doOnNext(validator::validate)
-                        .flatMap(personalService::create),
-                PersonalResponse.class
+                        .flatMap(personal -> {
+                            if (personal.personalId().isEmpty()) {
+                                return personalService.create(personal);
+                            }
+
+                            return personalService.update(personal);
+                        }),
+                String.class
         );
     }
 }

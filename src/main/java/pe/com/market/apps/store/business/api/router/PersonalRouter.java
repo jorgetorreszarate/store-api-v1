@@ -17,9 +17,9 @@ public class PersonalRouter {
     RouterFunction<ServerResponse> personalRoute(PersonalHanlder personalHandler) {
         return RouterFunctions
                 .route(GET("/api/v1/personal").and(accept(APPLICATION_JSON)), personalHandler::findAll)
+                .andRoute(GET("/api/v1/personal/{id}").and(accept(APPLICATION_JSON)), personalHandler::findById)
                 .andRoute(POST("/api/v1/personal").and(accept(APPLICATION_JSON)), personalHandler::create)
                 /*.andRoute(PUT("/api/v1/personal").and(accept(APPLICATION_JSON)), personalHandler::update)
-                .andRoute(PATCH("/api/v1/personal").and(accept(APPLICATION_JSON)), personalHandler::updatePassword)
                 .andRoute(DELETE("/api/v1/{id}/personal").and(accept(APPLICATION_JSON)), personalHandler::delete)*/;
     }
 }

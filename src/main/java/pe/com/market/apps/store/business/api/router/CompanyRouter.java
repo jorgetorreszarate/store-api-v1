@@ -1,22 +1,21 @@
-package pe.com.market.apps.store.security.api.router;
+package pe.com.market.apps.store.business.api.router;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import pe.com.market.apps.store.security.api.hander.AuthHandler;
+import pe.com.market.apps.store.business.api.handler.CompanyHandler;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.web.reactive.function.server.RequestPredicates.POST;
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
 @Configuration
-public class AuthRouter {
-
-	@Bean
-	public RouterFunction<ServerResponse> authRoute(AuthHandler authHandler) {
-		return RouterFunctions
-				.route(POST("/api/v1/auth/token").and(accept(APPLICATION_JSON)), authHandler::login);
-	}
+public class CompanyRouter {
+    @Bean
+    RouterFunction<ServerResponse> companyRoute(CompanyHandler companyHandler) {
+        return RouterFunctions
+                .route(GET("/api/v1/companies").and(accept(APPLICATION_JSON)), companyHandler::findAll);
+    }
 }

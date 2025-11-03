@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 @Builder
 public record PersonalRequest(
+        String personalId,
         @NotNull(message = "Campo obligatorio")
         String companyId,
         @NotNull(message = "Campo obligatorio")

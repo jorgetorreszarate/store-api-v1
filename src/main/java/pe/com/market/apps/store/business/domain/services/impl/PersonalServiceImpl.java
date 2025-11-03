@@ -54,6 +54,29 @@ public class PersonalServiceImpl implements PersonalService {
     }
 
     @Override
+    public Mono<String> update(PersonalRequest personalRequest) {
+        return personalRepository.findById(personalRequest.personalId())
+                .flatMap(personal -> {
+                    personal.setCompanyId(personalRequest.companyId());
+                    personal.setDocumentTypeId(personalRequest.documentTypeId());
+                    personal.setDocumentNumber(personalRequest.documentNumber());
+                    personal.setFatherLastName(personalRequest.fatherLastName());
+                    personal.setMotherLastName(personalRequest.motherLastName());
+                    personal.setName(personalRequest.name());
+                    personal.setBirthDate(personalRequest.birthDate());
+                    personal.setGenre(personalRequest.genre());
+                    personal.setCellphone(personalRequest.cellphone());
+                    personal.setEmail(personalRequest.email());
+                    personal.setAddress(personalRequest.address());
+                    personal.setFlagActive(personalRequest.flagActive());
+
+                    return Mono.just(personal);
+                })
+                .flatMap(personalRepository::save)
+                .flatMap(personal -> Mono.just(personal.getId()));
+    }
+
+    @Override
     public Mono<Boolean> delete(String personalId) {
         return personalRepository.findById(personalId)
                 .switchIfEmpty(Mono.error(new IllegalArgumentException("El personal no existe")))

@@ -14,5 +14,7 @@ public interface PersonalService {
 
     Mono<String> create(PersonalRequest personalRequest);
 
+    Mono<String> update(PersonalRequest personalRequest);
+
     Mono<Boolean> delete(String personalId);
 }

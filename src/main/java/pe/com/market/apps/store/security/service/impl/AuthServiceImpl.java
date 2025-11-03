@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
                 .flatMap(this::mapToResponse)
                 .map(user ->
 						new AuthResponse(jwtProviderUtils.generateToken(user)))
-				.switchIfEmpty(Mono.error(new AuthException("Credenciales incorrectas o username inactivo.")));
+				.switchIfEmpty(Mono.error(new AuthException("Credenciales incorrectas o usuario inactivo.")));
 	}
 
     private Mono<UserSingleResponse> mapToResponse(UserDocument user) {

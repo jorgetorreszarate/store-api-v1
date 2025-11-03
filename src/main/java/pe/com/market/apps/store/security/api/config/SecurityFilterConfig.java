@@ -27,7 +27,7 @@ public class SecurityFilterConfig {
 				.authorizeExchange(
 						authorizeExchangeSpec ->
 								authorizeExchangeSpec
-										.pathMatchers("/auth/**").permitAll()
+										.pathMatchers("/api/v1/auth/**").permitAll()
 										.anyExchange().authenticated()
 				)
 				.addFilterAfter(jwtFilter, SecurityWebFiltersOrder.FIRST)
